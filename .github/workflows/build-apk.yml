@@ -13,6 +13,9 @@ on:
       - master
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   build-apk:
     name: Build Android APK
@@ -59,7 +62,7 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           files: build/app/outputs/flutter-apk/app-release.apk
-          tag_name: ${{ github.ref_name == 'main' && 'v1.0.0-latest' || github.ref_name }}
+          tag_name: ${{ startsWith(github.ref, 'refs/tags/') && github.ref_name || 'v1.0.0-latest' }}
           name: YOBS App Release ${{ github.ref_name }}
           body: |
             ## 📱 YOBS - Catálogo de Servicios Laborales (Android APK)
