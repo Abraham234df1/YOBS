@@ -8,7 +8,7 @@ app.use(express.json());
 app.use(cors());
 
 // Cadena de conexión MongoDB
-const MONGO_URI = process.env.MONGO_URI || "mongodb+srv://admin:yobs2026password@cluster0.yobs.mongodb.net/yobs_db?retryWrites=true&w=majority";
+const MONGO_URI = process.env.MONGO_URI || "mongodb+srv://manuelrosadoochoa_db_user:sy7ZHQK5MbOidvtt@cluster0.qfiq5ym.mongodb.net/yobs_db?retryWrites=true&w=majority";
 
 // Conexión a MongoDB Atlas / Local
 mongoose.connect(MONGO_URI)

@@ -7,7 +7,7 @@ class MongoDbService {
   // Default MongoDB Connection String (MongoDB Atlas or Local MongoDB instance)
   // Replace with your MongoDB Connection String (e.g. mongodb+srv://<user>:<password>@cluster.mongodb.net/yobs_db)
   static const String mongoUri =
-      "mongodb+srv://admin:yobs2026password@cluster0.yobs.mongodb.net/yobs_db?retryWrites=true&w=majority";
+      "mongodb+srv://manuelrosadoochoa_db_user:sy7ZHQK5MbOidvtt@cluster0.qfiq5ym.mongodb.net/yobs_db?retryWrites=true&w=majority";
 
   static Db? _db;
   static DbCollection? _workersCollection;
