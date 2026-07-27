@@ -1,0 +1,76 @@
+name: Build & Release Android APK
+
+on:
+  push:
+    branches:
+      - main
+      - master
+    tags:
+      - 'v*'
+  pull_request:
+    branches:
+      - main
+      - master
+  workflow_dispatch:
+
+jobs:
+  build-apk:
+    name: Build Android APK
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📥 Checkout repository
+        uses: actions/checkout@v4
+
+      - name: ☕ Set up Java JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+          cache: 'gradle'
+
+      - name: 💙 Set up Flutter SDK
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          cache: true
+
+      - name: 📦 Install Flutter dependencies
+        run: flutter pub get
+
+      - name: 🔍 Analyze Dart code
+        run: flutter analyze
+
+      - name: 🔨 Build Android APK (Release)
+        run: flutter build apk --release --split-per-abi
+
+      - name: 🔨 Build Universal APK (Release)
+        run: flutter build apk --release
+
+      - name: 📤 Upload APK Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: YOBS-Android-APK
+          path: build/app/outputs/flutter-apk/*.apk
+          retention-days: 30
+
+      - name: 🏷️ Create GitHub Release (on tag or push)
+        if: startsWith(github.ref, 'refs/tags/') || github.ref == 'refs/heads/main'
+        uses: softprops/action-gh-release@v2
+        with:
+          files: build/app/outputs/flutter-apk/app-release.apk
+          tag_name: ${{ github.ref_name == 'main' && 'v1.0.0-latest' || github.ref_name }}
+          name: YOBS App Release ${{ github.ref_name }}
+          body: |
+            ## 📱 YOBS - Catálogo de Servicios Laborales (Android APK)
+            
+            ¡La versión ejecutable para Android ya está lista para instalar!
+            
+            ### 📥 Instrucciones de Instalación:
+            1. Descarga el archivo `app-release.apk` adjunto abajo en tu dispositivo Android.
+            2. Toca el archivo descargado para instalarlo (asegúrate de permitir la instalación desde fuentes desconocidas si tu teléfono lo solicita).
+            3. ¡Listo! Abre **YOBS** en tu celular.
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
