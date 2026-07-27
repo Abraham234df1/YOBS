@@ -3,8 +3,11 @@ import 'package:flutter/material.dart';
 import 'screens/role_selection_screen.dart';
 import 'screens/client_home_screen.dart';
 import 'screens/worker_home_screen.dart';
+import 'services/mongodb_service.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await MongoDbService.connect();
   runApp(const YobsApp());
 }
 
