@@ -7,7 +7,7 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>
-	<string>Yobs App</string>
+	<string>YOBS</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -15,7 +15,7 @@
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>
-	<string>yobs_app</string>
+	<string>YOBS</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
@@ -56,15 +56,25 @@
 	<key>UISupportedInterfaceOrientations</key>
 	<array>
 		<string>UIInterfaceOrientationPortrait</string>
-		<string>UIInterfaceOrientationLandscapeLeft</string>
-		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
 	<key>UISupportedInterfaceOrientations~ipad</key>
 	<array>
 		<string>UIInterfaceOrientationPortrait</string>
 		<string>UIInterfaceOrientationPortraitUpsideDown</string>
-		<string>UIInterfaceOrientationLandscapeLeft</string>
-		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>YOBS necesita acceso a tu ubicación para mostrarte profesionales cercanos a ti.</string>
+	<key>NSLocationAlwaysUsageDescription</key>
+	<string>YOBS necesita acceso continuo a tu ubicación para actualizaciones en tiempo real de profesionales cercanos.</string>
+	<key>NSCameraUsageDescription</key>
+	<string>YOBS necesita acceso a la cámara para tomar fotos de tu perfil o enviar imágenes en los chats de servicio.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>YOBS necesita acceso a tu galería de fotos para que puedas subir imágenes a tu perfil o en los chats.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>YOBS necesita acceso al micrófono para mensajes de voz en los chats con profesionales.</string>
+	<key>NSContactsUsageDescription</key>
+	<string>YOBS puede acceder a tus contactos para facilitarte invitar a amigos a la plataforma.</string>
+	<key>NSFaceIDUsageDescription</key>
+	<string>YOBS usa Face ID para un inicio de sesión más rápido y seguro en tu cuenta.</string>
 </dict>
 </plist>

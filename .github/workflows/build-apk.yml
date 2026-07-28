@@ -1,4 +1,4 @@
-name: Build & Release Android APK
+name: 🤖 Build & Release Android APK
 
 on:
   push:
@@ -57,7 +57,7 @@ jobs:
           path: build/app/outputs/flutter-apk/*.apk
           retention-days: 30
 
-      - name: 🏷️ Create GitHub Release (on tag or push)
+      - name: 🏷️ Create GitHub Release (on tag or push to main)
         if: startsWith(github.ref, 'refs/tags/') || github.ref == 'refs/heads/main'
         uses: softprops/action-gh-release@v2
         with:
@@ -65,14 +65,23 @@ jobs:
           tag_name: ${{ startsWith(github.ref, 'refs/tags/') && github.ref_name || 'v1.0.0-latest' }}
           name: YOBS App Release ${{ github.ref_name }}
           body: |
-            ## 📱 YOBS - Catálogo de Servicios Laborales (Android APK)
-            
-            ¡La versión ejecutable para Android ya está lista para instalar!
-            
-            ### 📥 Instrucciones de Instalación:
-            1. Descarga el archivo `app-release.apk` adjunto abajo en tu dispositivo Android.
-            2. Toca el archivo descargado para instalarlo (asegúrate de permitir la instalación desde fuentes desconocidas si tu teléfono lo solicita).
-            3. ¡Listo! Abre **YOBS** en tu celular.
+            ## 📱 YOBS – Catálogo de Servicios Laborales
+
+            | Plataforma | Estado | Descarga |
+            |------------|--------|----------|
+            | 🤖 Android | ✅ Disponible | `app-release.apk` (abajo) |
+            | 🍎 iOS     | ✅ Disponible | Ver workflow `build-ios.yml` |
+
+            ---
+
+            ### 🤖 Instrucciones Android:
+            1. Descarga `app-release.apk` desde los Assets de esta Release.
+            2. En tu Android: **Ajustes → Seguridad → Fuentes desconocidas → Activar**.
+            3. Abre el `.apk` descargado y toca **Instalar**.
+            4. ¡Abre YOBS! 🎉
+
+            ### 🍎 Instrucciones iOS:
+            Consulta la [Release de iOS](../../releases) generada por el workflow `build-ios.yml` para descargar e instalar el IPA mediante **AltStore** o **Sideloadly**.
           draft: false
           prerelease: false
         env:

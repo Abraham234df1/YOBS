@@ -1,0 +1,83 @@
+name: 🍎 Build & Release iOS IPA
+
+on:
+  push:
+    branches:
+      - main
+      - master
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-ios:
+    name: Build iOS IPA (No Code Sign)
+    runs-on: macos-latest
+
+    steps:
+      - name: 📥 Checkout repository
+        uses: actions/checkout@v4
+
+      - name: 💙 Set up Flutter SDK
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          cache: true
+
+      - name: 📦 Install Flutter dependencies
+        run: flutter pub get
+
+      - name: 🔍 Analyze Dart code
+        run: flutter analyze
+
+      - name: 🍎 Build iOS (No Code Signing – for CI/simulator distribution)
+        run: flutter build ios --release --no-codesign
+
+      - name: 📁 Create IPA archive (unsigned)
+        run: |
+          mkdir -p build/ios/ipa/Payload
+          cp -r build/ios/Release-iphoneos/Runner.app build/ios/ipa/Payload/Runner.app
+          cd build/ios/ipa
+          zip -r ../../../YOBS-iOS-unsigned.ipa Payload
+
+      - name: 📤 Upload iOS IPA Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: YOBS-iOS-IPA
+          path: YOBS-iOS-unsigned.ipa
+          retention-days: 30
+
+      - name: 🏷️ Create GitHub Release with IPA
+        uses: softprops/action-gh-release@v2
+        with:
+          files: YOBS-iOS-unsigned.ipa
+          tag_name: ${{ startsWith(github.ref, 'refs/tags/') && github.ref_name || 'v1.0.0-ios-latest' }}
+          name: YOBS iOS Release ${{ github.ref_name }}
+          body: |
+            ## 📱 YOBS – Catálogo de Servicios Laborales (iOS IPA)
+
+            > ⚠️ **IPA sin firma de código** (unsigned) – Para instalar en dispositivos físicos es necesario firmar con tu Apple Developer Account o usar AltStore / Sideloadly.
+
+            ### 📥 Cómo instalar el IPA en tu iPhone o iPad:
+            **Opción A – Usando AltStore (Sin cuenta de pago):**
+            1. Instala [AltStore](https://altstore.io/) en tu PC/Mac y en tu iPhone.
+            2. Descarga `YOBS-iOS-unsigned.ipa` desde los Assets de esta Release.
+            3. Abre AltStore en tu iPhone → toca el `+` → selecciona el archivo `.ipa`.
+            4. ¡Listo! Abre YOBS desde tu pantalla de inicio.
+
+            **Opción B – Usando Sideloadly (Windows/Mac):**
+            1. Descarga [Sideloadly](https://sideloadly.io/).
+            2. Conecta tu iPhone por USB y abre Sideloadly.
+            3. Arrastra `YOBS-iOS-unsigned.ipa` a Sideloadly y haz clic en "Start".
+            4. Ingresa tu Apple ID cuando se te solicite.
+
+            **Opción C – Usando Xcode (para desarrolladores):**
+            1. Clona el repositorio.
+            2. Abre `ios/Runner.xcworkspace` en Xcode.
+            3. Conecta tu iPhone y selecciónalo como destino.
+            4. Firma con tu Apple Developer Account y ejecuta.
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
