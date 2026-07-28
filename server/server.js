@@ -110,6 +110,67 @@ app.patch('/api/requests/:id/status', async (req, res) => {
   }
 });
 
+// Schema para Pedidos (Orders)
+const OrderSchema = new mongoose.Schema({
+  orderId: { type: String, required: true, unique: true },
+  serviceTitle: String,
+  categoryId: String,
+  workerId: String,
+  workerName: String,
+  workerTrade: String,
+  clientName: String,
+  clientPhone: String,
+  orderDate: { type: Date, default: Date.now },
+  serviceAddress: String,
+  serviceDescription: String,
+  estimatedCost: Number,
+  hourlyRate: Number,
+  estimatedHours: Number,
+  status: { type: String, enum: ['pendiente', 'enProceso', 'finalizado', 'cancelado'], default: 'pendiente' },
+  paymentMethod: String,
+  isPaid: { type: Boolean, default: true },
+  receiptNumber: String,
+  completedAt: Date
+}, { timestamps: true });
+
+const Order = mongoose.model('Order', OrderSchema);
+
+// 6. Crear un nuevo pedido en MongoDB
+app.post('/api/orders', async (req, res) => {
+  try {
+    const newOrder = new Order(req.body);
+    await newOrder.save();
+    res.status(201).json(newOrder);
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
+// 7. Obtener pedidos por cliente
+app.get('/api/orders/client/:clientName', async (req, res) => {
+  try {
+    const orders = await Order.find({ clientName: req.params.clientName }).sort({ createdAt: -1 });
+    res.json(orders);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// 8. Actualizar estado de un pedido
+app.patch('/api/orders/:orderId/status', async (req, res) => {
+  try {
+    const { status } = req.body;
+    const updated = await Order.findOneAndUpdate(
+      { orderId: req.params.orderId },
+      { status, completedAt: status === 'finalizado' ? new Date() : null },
+      { new: true }
+    );
+    res.json(updated);
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`🚀 Servidor backend YOBS escuchando en http://localhost:${PORT}`);

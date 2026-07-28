@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../models/models.dart';
 import '../services/mock_data_service.dart';
+import '../services/order_database_service.dart';
 import 'chat_screen.dart';
 
 class WorkerHomeScreen extends StatefulWidget {
@@ -293,10 +294,11 @@ class _WorkerHomeScreenState extends State<WorkerHomeScreen> {
                       foregroundColor: const Color(0xFFEF4444),
                       side: const BorderSide(color: Color(0xFFEF4444)),
                     ),
-                    onPressed: () {
+                    onPressed: () async {
                       setState(() {
                         req.status = RequestStatus.cancelado;
                       });
+                      await OrderDatabaseService.updateOrderStatus(req.id, 'cancelado');
                     },
                     child: const Text('Rechazar'),
                   ),
@@ -308,16 +310,19 @@ class _WorkerHomeScreenState extends State<WorkerHomeScreen> {
                       backgroundColor: const Color(0xFF059669),
                       foregroundColor: Colors.white,
                     ),
-                    onPressed: () {
+                    onPressed: () async {
                       setState(() {
                         req.status = RequestStatus.enProceso;
                       });
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          backgroundColor: Color(0xFF059669),
-                          content: Text('¡Trabajo Aceptado! Se ha notificado al cliente.'),
-                        ),
-                      );
+                      await OrderDatabaseService.updateOrderStatus(req.id, 'enProceso');
+                      if (mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            backgroundColor: Color(0xFF059669),
+                            content: Text('¡Trabajo Aceptado y actualizado en MongoDB!'),
+                          ),
+                        );
+                      }
                     },
                     child: const Text('Aceptar Trabajo'),
                   ),
@@ -335,10 +340,11 @@ class _WorkerHomeScreenState extends State<WorkerHomeScreen> {
                     ),
                     icon: const Icon(Icons.check_circle_rounded, size: 18),
                     label: const Text('Marcar como Finalizado'),
-                    onPressed: () {
+                    onPressed: () async {
                       setState(() {
                         req.status = RequestStatus.finalizado;
                       });
+                      await OrderDatabaseService.updateOrderStatus(req.id, 'finalizado');
                     },
                   ),
                 ),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../models/models.dart';
+import '../services/order_database_service.dart';
 
 class WorkerDetailScreen extends StatefulWidget {
   final WorkerProfile worker;
@@ -142,7 +143,7 @@ class _WorkerDetailScreenState extends State<WorkerDetailScreen> {
                           borderRadius: BorderRadius.circular(14),
                         ),
                       ),
-                      onPressed: () {
+                      onPressed: () async {
                         if (descController.text.trim().isEmpty) {
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(content: Text('Por favor describe los detalles del servicio.')),
@@ -150,29 +151,36 @@ class _WorkerDetailScreenState extends State<WorkerDetailScreen> {
                           return;
                         }
 
+                        final desc = descController.text;
+                        final payment = selectedPayment;
+
+                        Navigator.pop(ctx);
+                        Navigator.pop(context);
+
+                        // Guardar el pedido en MongoDB Database
+                        final savedOrder = await OrderDatabaseService.createOrder(
+                          worker: widget.worker,
+                          clientName: 'Manuel López',
+                          address: addressController.text,
+                          description: desc,
+                          paymentMethod: payment,
+                        );
+
                         final newReq = JobRequest(
-                          id: 'REQ-${DateTime.now().millisecondsSinceEpoch.toString().substring(7)}',
+                          id: savedOrder?.orderId ?? 'REQ-${DateTime.now().millisecondsSinceEpoch.toString().substring(7)}',
                           serviceTitle: widget.worker.mainTrade,
                           worker: widget.worker,
                           clientName: 'Manuel López',
                           date: DateTime.now(),
                           address: addressController.text,
-                          description: descController.text,
+                          description: desc,
                           estimatedCost: widget.worker.hourlyRate * 2,
-                          paymentMethod: selectedPayment,
+                          paymentMethod: payment,
                           status: RequestStatus.pendiente,
+                          isPaid: true,
                         );
 
                         widget.onRequestCreated(newReq);
-                        Navigator.pop(ctx);
-                        Navigator.pop(context);
-
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            backgroundColor: const Color(0xFF10B981),
-                            content: Text('¡Solicitud enviada a ${widget.worker.name}! Puedes darle seguimiento en Mis Solicitudes.'),
-                          ),
-                        );
                       },
                       child: const Text(
                         'Confirmar y Enviar Solicitud',
