@@ -1,15 +1,12 @@
 import 'package:flutter/material.dart';
-import '../models/models.dart';
-import '../services/mock_data_service.dart';
 import '../services/order_database_service.dart';
-import 'chat_screen.dart';
-
+import '../widgets/yobs_logo_widget.dart';
 class WorkerHomeScreen extends StatefulWidget {
-  final VoidCallback onSwitchRole;
+  final VoidCallback onLogout;
 
   const WorkerHomeScreen({
     super.key,
-    required this.onSwitchRole,
+    required this.onLogout,
   });
 
   @override
@@ -18,74 +15,56 @@ class WorkerHomeScreen extends StatefulWidget {
 
 class _WorkerHomeScreenState extends State<WorkerHomeScreen> {
   int _currentIndex = 0;
-  final List<JobRequest> _requests = List.from(MockDataService.requests);
-
-  double get _totalEarnings {
-    return _requests
-        .where((r) => r.status == RequestStatus.finalizado || r.status == RequestStatus.enProceso)
-        .fold(0.0, (sum, r) => sum + r.estimatedCost);
-  }
+  String _historialFilter = 'todos';
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF6F6F0),
+      backgroundColor: const Color(0xFFF7F7F2),
       appBar: AppBar(
-        backgroundColor: const Color(0xFF111A20),
-        title: const Row(
-          children: [
-            Icon(Icons.dashboard_rounded, color: Color(0xFFFB7A01)),
-            SizedBox(width: 8),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'YOBS Worker',
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.white),
-                ),
-                Text(
-                  'route: /worker/dashboard',
-                  style: TextStyle(fontSize: 10, color: Color(0xFFFB7A01)),
-                ),
-              ],
-            ),
-          ],
-        ),
+        backgroundColor: Colors.white,
+        elevation: 0,
+        title: const YobsLogoWidget(fontSize: 26),
         actions: [
           IconButton(
-            icon: const Icon(Icons.swap_horiz_rounded, color: Colors.white),
-            tooltip: 'Cambiar a modo Cliente',
-            onPressed: widget.onSwitchRole,
+            icon: const Icon(Icons.logout_rounded, color: Color(0xFF6B7280)),
+            tooltip: 'Salir',
+            onPressed: widget.onLogout,
           ),
         ],
       ),
       body: _buildCurrentTab(),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _currentIndex,
-        selectedItemColor: const Color(0xFFFB7A01), // Figma Primary Orange
-        unselectedItemColor: const Color(0xFF6E717F),
+        selectedItemColor: const Color(0xFFFF6600), // Figma Orange
+        unselectedItemColor: const Color(0xFF6B7280),
         backgroundColor: Colors.white,
         type: BottomNavigationBarType.fixed,
         onTap: (idx) => setState(() => _currentIndex = idx),
         items: const [
           BottomNavigationBarItem(
-            icon: Icon(Icons.dashboard_rounded),
-            label: 'Dashboard',
+            icon: Icon(Icons.grid_view_outlined),
+            activeIcon: Icon(Icons.grid_view_rounded),
+            label: 'Panel',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.work_outline_rounded),
-            label: 'Solicitudes',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.calendar_month_rounded),
+            icon: Icon(Icons.calendar_month_outlined),
+            activeIcon: Icon(Icons.calendar_month_rounded),
             label: 'Agenda',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.trending_up_rounded),
-            label: 'Ganancias',
+            icon: Icon(Icons.assignment_outlined),
+            activeIcon: Icon(Icons.assignment_rounded),
+            label: 'Historial',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.attach_money_rounded),
+            activeIcon: Icon(Icons.attach_money_rounded),
+            label: 'Ingresos',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.person_outline_rounded),
+            activeIcon: Icon(Icons.person_rounded),
             label: 'Perfil',
           ),
         ],
@@ -96,197 +75,91 @@ class _WorkerHomeScreenState extends State<WorkerHomeScreen> {
   Widget _buildCurrentTab() {
     switch (_currentIndex) {
       case 0:
-        return _buildDashboardTab();
+        return _buildPanelTab();
       case 1:
-        return _buildRequestsTab();
-      case 2:
         return _buildAgendaTab();
+      case 2:
+        return _buildHistorialTab();
       case 3:
-        return _buildEarningsTab();
+        return _buildIngresosTab();
       case 4:
-        return _buildProfileTab();
+        return _buildPerfilTab();
       default:
-        return _buildDashboardTab();
+        return _buildPanelTab();
     }
   }
 
-  // --- TAB 1: DASHBOARD (/worker/dashboard) ---
-  Widget _buildDashboardTab() {
-    final pendingCount = _requests.where((r) => r.status == RequestStatus.pendiente).length;
-    final activeCount = _requests.where((r) => r.status == RequestStatus.enProceso).length;
-
+  // --- TAB 1: PANEL (Figma Image 10) ---
+  Widget _buildPanelTab() {
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Banner de Ganancias según diseño Figma (#111A20 & #FB7A01)
-          Container(
-            padding: const EdgeInsets.all(24),
-            decoration: BoxDecoration(
-              gradient: const LinearGradient(
-                colors: [Color(0xFF111A20), Color(0xFF1E2A32)],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-              borderRadius: BorderRadius.circular(24),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withAlpha(50),
-                  blurRadius: 12,
-                  offset: const Offset(0, 4),
-                ),
-              ],
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      'Resumen de Ingresos',
-                      style: TextStyle(color: Color(0xFF6E717F), fontSize: 13, fontWeight: FontWeight.w600),
-                    ),
-                    Icon(Icons.account_balance_wallet_rounded, color: Color(0xFFFB7A01)),
-                  ],
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  '\$${_totalEarnings.toStringAsFixed(2)} USD',
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 32,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: 12),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFFB7A01).withAlpha(40),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: const Text(
-                    '+18.5% incremento mensual',
-                    style: TextStyle(color: Color(0xFFFB7A01), fontSize: 12, fontWeight: FontWeight.bold),
-                  ),
-                ),
-              ],
-            ),
-          ),
+          const Text('Hola, Carlos', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Color(0xFF111827))),
+          const SizedBox(height: 2),
+          const Text('Aquí está tu resumen de hoy', style: TextStyle(color: Color(0xFF6B7280), fontSize: 14)),
+          const SizedBox(height: 20),
 
-          const SizedBox(height: 24),
-
-          // Métricas de desempeño según Figma
           Row(
             children: [
-              Expanded(
-                child: _buildMetricCard(
-                  icon: Icons.pending_actions_rounded,
-                  title: 'Pendientes',
-                  value: '$pendingCount',
-                  color: const Color(0xFFFB7A01),
+              const Text('Solicitudes', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Color(0xFF111827))),
+              const SizedBox(width: 8),
+              Container(
+                padding: const EdgeInsets.all(6),
+                decoration: const BoxDecoration(
+                  color: Color(0xFFFF6600),
+                  shape: BoxShape.circle,
                 ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: _buildMetricCard(
-                  icon: Icons.engineering_rounded,
-                  title: 'En Proceso',
-                  value: '$activeCount',
-                  color: const Color(0xFF2563EB),
-                ),
+                child: const Text('2', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12)),
               ),
             ],
           ),
+          const SizedBox(height: 14),
 
-          const SizedBox(height: 24),
-
-          const Text(
-            'Solicitudes de Empleo Entrantes',
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Color(0xFF111A20)),
+          // Request Card 1 (María García - Normal)
+          _buildRequestCard(
+            clientName: 'María García',
+            tag: 'Normal',
+            isUrgent: false,
+            time: 'Hoy, 3:45 PM',
+            serviceDescription: 'Instalación de 3 enchufes en...',
+            address: 'Av. Insurgentes 24...',
+            reqId: 'REQ-101',
           ),
-          const SizedBox(height: 12),
 
-          ListView.builder(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            itemCount: _requests.length,
-            itemBuilder: (ctx, idx) {
-              return _buildWorkerRequestTile(_requests[idx]);
-            },
+          const SizedBox(height: 14),
+
+          // Request Card 2 (Pedro López - Urgente)
+          _buildRequestCard(
+            clientName: 'Pedro López',
+            tag: 'Urgente',
+            isUrgent: true,
+            time: 'Hoy, 4:10 PM',
+            serviceDescription: 'Corto circuito en cocina —...',
+            address: 'Calle Durango 88, ...',
+            reqId: 'REQ-102',
           ),
         ],
       ),
     );
   }
 
-  Widget _buildMetricCard({
-    required IconData icon,
-    required String title,
-    required String value,
-    required Color color,
+  Widget _buildRequestCard({
+    required String clientName,
+    required String tag,
+    required bool isUrgent,
+    required String time,
+    required String serviceDescription,
+    required String address,
+    required String reqId,
   }) {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: const Color(0xFFE5E7EB)),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Icon(icon, color: color, size: 28),
-          const SizedBox(height: 10),
-          Text(title, style: const TextStyle(color: Color(0xFF6E717F), fontSize: 12)),
-          const SizedBox(height: 2),
-          Text(value, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 20, color: Color(0xFF111A20))),
-        ],
-      ),
-    );
-  }
-
-  // --- TAB 2: SOLICITUDES (/worker/requests) ---
-  Widget _buildRequestsTab() {
-    return Padding(
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(
-            'Gestión de Solicitudes Recibidas',
-            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Color(0xFF111A20)),
-          ),
-          const SizedBox(height: 4),
-          const Text(
-            'Acepta o rechaza solicitudes de clientes en tiempo real.',
-            style: TextStyle(color: Color(0xFF6E717F), fontSize: 13),
-          ),
-          const SizedBox(height: 16),
-
-          Expanded(
-            child: ListView.builder(
-              itemCount: _requests.length,
-              itemBuilder: (ctx, idx) {
-                return _buildWorkerRequestTile(_requests[idx]);
-              },
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildWorkerRequestTile(JobRequest req) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 14),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: const Color(0xFFE5E7EB)),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: const Color(0xFFEBEBE6)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -294,148 +167,156 @@ class _WorkerHomeScreenState extends State<WorkerHomeScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                'Cliente: ${req.clientName}',
-                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: Color(0xFF111A20)),
+              Row(
+                children: [
+                  const CircleAvatar(radius: 4, backgroundColor: Color(0xFFFF6600)),
+                  const SizedBox(width: 6),
+                  Text(clientName, style: const TextStyle(fontWeight: FontWeight.bold, color: Color(0xFFFF6600), fontSize: 13)),
+                  const SizedBox(width: 6),
+                  const Text('Nueva solicitud', style: TextStyle(color: Color(0xFF6B7280), fontSize: 12)),
+                ],
               ),
-              Text(
-                '\$${req.estimatedCost.toStringAsFixed(0)} USD',
-                style: const TextStyle(fontWeight: FontWeight.bold, color: Color(0xFFFB7A01), fontSize: 16),
+              Text(time, style: const TextStyle(color: Color(0xFF6B7280), fontSize: 11)),
+            ],
+          ),
+          const Divider(height: 20),
+          Row(
+            children: [
+              const CircleAvatar(radius: 20, backgroundColor: Color(0xFFEBEBE6), child: Icon(Icons.person, color: Color(0xFF6B7280))),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Text(clientName, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
+                        const SizedBox(width: 6),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                          decoration: BoxDecoration(
+                            color: isUrgent ? const Color(0xFFFEE2E2) : const Color(0xFFF0EFE6),
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: Text(
+                            tag,
+                            style: TextStyle(
+                              color: isUrgent ? const Color(0xFFEF4444) : const Color(0xFF6B7280),
+                              fontWeight: FontWeight.bold,
+                              fontSize: 11,
+                            ),
+                          ),
+                        ),
+                        const Spacer(),
+                        const Text('Por trabajo', style: TextStyle(fontWeight: FontWeight.bold, color: Color(0xFFFF6600), fontSize: 13)),
+                      ],
+                    ),
+                    const SizedBox(height: 2),
+                    Text(serviceDescription, style: const TextStyle(color: Color(0xFF4B5563), fontSize: 12)),
+                  ],
+                ),
               ),
             ],
           ),
-          const SizedBox(height: 4),
-          Text(req.serviceTitle, style: const TextStyle(fontWeight: FontWeight.w600, color: Color(0xFF374151))),
-          const SizedBox(height: 4),
-          Text('📍 ${req.address}', style: const TextStyle(color: Color(0xFF6E717F), fontSize: 12)),
-          const SizedBox(height: 6),
-          Text('📝 "${req.description}"', style: const TextStyle(color: Color(0xFF4B5563), fontSize: 12, fontStyle: FontStyle.italic)),
-
-          const SizedBox(height: 14),
-
-          if (req.status == RequestStatus.pendiente)
-            Row(
-              children: [
-                Expanded(
-                  child: OutlinedButton(
-                    style: OutlinedButton.styleFrom(
-                      foregroundColor: const Color(0xFFEF4444),
-                      side: const BorderSide(color: Color(0xFFEF4444)),
-                    ),
-                    onPressed: () async {
-                      setState(() {
-                        req.status = RequestStatus.cancelado;
-                      });
-                      await OrderDatabaseService.updateOrderStatus(req.id, 'cancelado');
-                    },
-                    child: const Text('Rechazar'),
-                  ),
+          const SizedBox(height: 12),
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                decoration: BoxDecoration(color: const Color(0xFFF7F7F2), borderRadius: BorderRadius.circular(12)),
+                child: Row(
+                  children: [
+                    const Icon(Icons.location_on_outlined, size: 14, color: Color(0xFFFF6600)),
+                    const SizedBox(width: 4),
+                    Text(address, style: const TextStyle(fontSize: 11, color: Color(0xFF6B7280))),
+                  ],
                 ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFFFB7A01),
-                      foregroundColor: Colors.white,
-                    ),
-                    onPressed: () async {
-                      setState(() {
-                        req.status = RequestStatus.enProceso;
-                      });
-                      await OrderDatabaseService.updateOrderStatus(req.id, 'enProceso');
-                      if (mounted) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            backgroundColor: Color(0xFFFB7A01),
-                            content: Text('¡Trabajo Aceptado y actualizado en MongoDB!'),
-                          ),
-                        );
-                      }
-                    },
-                    child: const Text('Aceptar Trabajo'),
-                  ),
+              ),
+              const SizedBox(width: 8),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                decoration: BoxDecoration(color: const Color(0xFFF7F7F2), borderRadius: BorderRadius.circular(12)),
+                child: const Row(
+                  children: [
+                    Icon(Icons.calendar_month_outlined, size: 14, color: Color(0xFFFF6600)),
+                    SizedBox(width: 4),
+                    Text('Hoy', style: TextStyle(fontSize: 11, color: Color(0xFF6B7280))),
+                  ],
                 ),
-              ],
-            )
-          else if (req.status == RequestStatus.enProceso)
-            Row(
-              children: [
-                Expanded(
-                  child: ElevatedButton.icon(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF111A20),
-                      foregroundColor: Colors.white,
-                    ),
-                    icon: const Icon(Icons.check_circle_rounded, size: 18),
-                    label: const Text('Marcar como Finalizado'),
-                    onPressed: () async {
-                      setState(() {
-                        req.status = RequestStatus.finalizado;
-                      });
-                      await OrderDatabaseService.updateOrderStatus(req.id, 'finalizado');
-                    },
-                  ),
-                ),
-                const SizedBox(width: 8),
-                IconButton(
-                  icon: const Icon(Icons.chat_rounded, color: Color(0xFFFB7A01)),
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => ChatScreen(
-                          title: req.clientName,
-                          messages: MockDataService.initialMessages,
-                        ),
-                      ),
-                    );
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          Row(
+            children: [
+              Expanded(
+                child: OutlinedButton.icon(
+                  onPressed: () async {
+                    await OrderDatabaseService.updateOrderStatus(reqId, 'cancelado');
+                    if (mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Solicitud rechazada.')));
+                    }
                   },
+                  icon: const Icon(Icons.cancel_outlined, color: Color(0xFFEF4444), size: 18),
+                  label: const Text('Rechazar', style: TextStyle(color: Color(0xFFEF4444))),
                 ),
-              ],
-            )
-          else
-            Text(
-              'Estado: ${req.status.name.toUpperCase()}',
-              style: const TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF6E717F), fontSize: 12),
-            ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: ElevatedButton.icon(
+                  onPressed: () async {
+                    await OrderDatabaseService.updateOrderStatus(reqId, 'enProceso');
+                    if (mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(backgroundColor: Color(0xFFFF6600), content: Text('¡Trabajo Aceptado! Registrado en MongoDB.')),
+                      );
+                    }
+                  },
+                  icon: const Icon(Icons.visibility_outlined, size: 18),
+                  label: const Text('Ver detalles'),
+                ),
+              ),
+            ],
+          ),
         ],
       ),
     );
   }
 
-  // --- TAB 3: AGENDA (/worker/agenda) ---
+  // --- TAB 2: AGENDA (Figma Image 12) ---
   Widget _buildAgendaTab() {
     return Padding(
       padding: const EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'Agenda de Trabajos Programados',
-            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Color(0xFF111A20)),
-          ),
+          const Text('AGENDA', style: TextStyle(color: Color(0xFFFF6600), fontWeight: FontWeight.bold, fontSize: 11, letterSpacing: 1)),
+          const SizedBox(height: 2),
+          const Text('Trabajos programados', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Color(0xFF111827))),
           const SizedBox(height: 16),
+
+          // Counter Cards Row (5 Total, 3 Confirmados, 2 Pendientes)
+          Row(
+            children: [
+              Expanded(child: _buildAgendaCountCard('5', 'Total', const Color(0xFFFF6600), Colors.white)),
+              const SizedBox(width: 10),
+              Expanded(child: _buildAgendaCountCard('3', 'Confirmados', const Color(0xFFD1FAE5), const Color(0xFF047857))),
+              const SizedBox(width: 10),
+              Expanded(child: _buildAgendaCountCard('2', 'Pendientes', const Color(0xFFFEF3C7), const Color(0xFFD97706))),
+            ],
+          ),
+
+          const SizedBox(height: 20),
+          const Text('PRÓXIMOS', style: TextStyle(color: Color(0xFFFF6600), fontWeight: FontWeight.bold, fontSize: 11, letterSpacing: 1)),
+          const SizedBox(height: 12),
+
           Expanded(
-            child: ListView.builder(
-              itemCount: _requests.length,
-              itemBuilder: (ctx, idx) {
-                final item = _requests[idx];
-                return ListTile(
-                  contentPadding: const EdgeInsets.all(12),
-                  tileColor: Colors.white,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
-                    side: const BorderSide(color: Color(0xFFE5E7EB)),
-                  ),
-                  leading: const CircleAvatar(
-                    backgroundColor: Color(0xFFFB7A01),
-                    child: Icon(Icons.calendar_today_rounded, color: Colors.white, size: 18),
-                  ),
-                  title: Text(item.serviceTitle, style: const TextStyle(fontWeight: FontWeight.bold)),
-                  subtitle: Text('Cliente: ${item.clientName}\nHorario: 10:00 AM - 12:00 PM'),
-                  trailing: const Icon(Icons.chevron_right_rounded),
-                );
-              },
+            child: ListView(
+              children: [
+                _buildAgendaJobCard('Revisión de tablero eléctrico', 'Juan Pérez · Hoy 4:00 PM', '\$150', 'Confirmado', true),
+                _buildAgendaJobCard('Instalación de lámparas LED', 'Laura Nieto · Mañana 10:30 AM', '\$120', 'Pendiente', false),
+                _buildAgendaJobCard('Corto circuito en cocina', 'Roberto Sánchez · 23 Jul 9:00 AM', '\$200', 'Confirmado', true),
+              ],
             ),
           ),
         ],
@@ -443,42 +324,129 @@ class _WorkerHomeScreenState extends State<WorkerHomeScreen> {
     );
   }
 
-  // --- TAB 4: GANANCIAS & DESEMPEÑO (/worker/earnings) ---
-  Widget _buildEarningsTab() {
-    return SingleChildScrollView(
+  Widget _buildAgendaCountCard(String count, String label, Color bg, Color textColor) {
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 16),
+      decoration: BoxDecoration(
+        color: bg,
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: const Color(0xFFEBEBE6)),
+      ),
+      child: Column(
+        children: [
+          Text(count, style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: textColor)),
+          const SizedBox(height: 2),
+          Text(label, style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: textColor)),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildAgendaJobCard(String title, String sub, String price, String status, bool isConfirmed) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: const Color(0xFFEBEBE6)),
+      ),
+      child: Row(
+        children: [
+          const CircleAvatar(radius: 20, backgroundColor: Color(0xFFEBEBE6), child: Icon(Icons.person, color: Color(0xFF6B7280))),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(title, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+                const SizedBox(height: 2),
+                Text(sub, style: const TextStyle(color: Color(0xFF6B7280), fontSize: 11)),
+              ],
+            ),
+          ),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              Text(price, style: const TextStyle(fontWeight: FontWeight.bold, color: Color(0xFFFF6600), fontSize: 15)),
+              const SizedBox(height: 4),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                decoration: BoxDecoration(
+                  color: isConfirmed ? const Color(0xFFD1FAE5) : const Color(0xFFFEF3C7),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Text(
+                  status,
+                  style: TextStyle(
+                    color: isConfirmed ? const Color(0xFF047857) : const Color(0xFFD97706),
+                    fontWeight: FontWeight.bold,
+                    fontSize: 10,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  // --- TAB 3: HISTORIAL (Figma Image 15) ---
+  Widget _buildHistorialTab() {
+    return Padding(
       padding: const EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'Estadísticas de Ingresos y Desempeño',
-            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Color(0xFF111A20)),
-          ),
+          const Text('HISTORIAL', style: TextStyle(color: Color(0xFFFF6600), fontWeight: FontWeight.bold, fontSize: 11, letterSpacing: 1)),
+          const SizedBox(height: 2),
+          const Text('Servicios finalizados', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Color(0xFF111827))),
           const SizedBox(height: 16),
 
+          // Reputation Card
           Container(
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(20),
-              border: Border.all(color: const Color(0xFFE5E7EB)),
+              border: Border.all(color: const Color(0xFFEBEBE6)),
             ),
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text('Ingresos Semanales', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-                const SizedBox(height: 16),
-                // Simple bar representation for earnings
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  crossAxisAlignment: CrossAxisAlignment.end,
+                const Text('Reputación actual', style: TextStyle(color: Color(0xFF6B7280), fontSize: 12)),
+                const SizedBox(height: 4),
+                const Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    _buildBar('Lun', 60),
-                    _buildBar('Mar', 90),
-                    _buildBar('Mié', 120),
-                    _buildBar('Jue', 40),
-                    _buildBar('Vie', 150),
-                    _buildBar('Sáb', 200),
+                    Text('4.7 ', style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold, color: Color(0xFF111827))),
+                    Icon(Icons.star_rounded, color: Color(0xFFFF6600), size: 28),
+                    Icon(Icons.star_rounded, color: Color(0xFFFF6600), size: 28),
+                    Icon(Icons.star_rounded, color: Color(0xFFFF6600), size: 28),
+                    Icon(Icons.star_rounded, color: Color(0xFFFF6600), size: 28),
+                    Icon(Icons.star_half_rounded, color: Color(0xFFFF6600), size: 28),
+                  ],
+                ),
+                const Text('3 evaluaciones recibidas', style: TextStyle(color: Color(0xFF6B7280), fontSize: 11)),
+                const SizedBox(height: 16),
+
+                Row(
+                  children: [
+                    Expanded(child: _buildHistStatBox('5', 'Servicios', const Color(0xFFFFEAD5))),
+                    const SizedBox(width: 10),
+                    Expanded(child: _buildHistStatBox('3', 'Calificados', const Color(0xFFF0EFE6))),
+                    const SizedBox(width: 10),
+                    Expanded(child: _buildHistStatBox('2', 'Pendientes', const Color(0xFFF0EFE6))),
+                  ],
+                ),
+
+                const Divider(height: 24),
+
+                Row(
+                  children: [
+                    _buildFilterPill('todos', 'Todos los servicios'),
+                    const SizedBox(width: 8),
+                    _buildFilterPill('calificados', 'Calificados'),
                   ],
                 ),
               ],
@@ -489,70 +457,281 @@ class _WorkerHomeScreenState extends State<WorkerHomeScreen> {
     );
   }
 
-  Widget _buildBar(String day, double height) {
-    return Column(
-      children: [
-        Container(
-          height: height,
-          width: 24,
-          decoration: BoxDecoration(
-            color: const Color(0xFFFB7A01),
-            borderRadius: BorderRadius.circular(6),
-          ),
-        ),
-        const SizedBox(height: 6),
-        Text(day, style: const TextStyle(fontSize: 11, color: Color(0xFF6E717F))),
-      ],
+  Widget _buildHistStatBox(String val, String lbl, Color bg) {
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 12),
+      decoration: BoxDecoration(color: bg, borderRadius: BorderRadius.circular(14)),
+      child: Column(
+        children: [
+          Text(val, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Color(0xFFFF6600))),
+          Text(lbl, style: const TextStyle(fontSize: 10, color: Color(0xFF6B7280))),
+        ],
+      ),
     );
   }
 
-  // --- TAB 5: MI PERFIL (/worker/profile) ---
-  Widget _buildProfileTab() {
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(20),
-      child: Column(
-        children: [
-          const CircleAvatar(
-            radius: 44,
-            backgroundColor: Color(0xFFFB7A01),
-            child: Text(
-              'CM',
-              style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: Colors.white),
-            ),
+  Widget _buildFilterPill(String id, String label) {
+    final active = _historialFilter == id;
+    return GestureDetector(
+      onTap: () => setState(() => _historialFilter = id),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+        decoration: BoxDecoration(
+          color: active ? const Color(0xFFFF6600) : const Color(0xFFF0EFE6),
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: Text(
+          label,
+          style: TextStyle(
+            color: active ? Colors.white : const Color(0xFF6B7280),
+            fontWeight: FontWeight.bold,
+            fontSize: 11,
           ),
-          const SizedBox(height: 12),
-          const Text(
-            'Carlos Mendoza',
-            style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Color(0xFF111A20)),
-          ),
-          const Text(
-            'Electricista Certificado • route: /worker/profile',
-            style: TextStyle(color: Color(0xFF6E717F), fontSize: 12),
-          ),
-          const SizedBox(height: 24),
+        ),
+      ),
+    );
+  }
 
-          ListTile(
-            leading: const Icon(Icons.verified_rounded, color: Color(0xFFFB7A01)),
-            title: const Text('Certificaciones y Documentación'),
-            trailing: const Icon(Icons.chevron_right_rounded),
-            onTap: () {},
-          ),
-          const Divider(),
-          ListTile(
-            leading: const Icon(Icons.photo_library_rounded, color: Color(0xFFFB7A01)),
-            title: const Text('Galería de Trabajos (Portafolio)'),
-            trailing: const Icon(Icons.chevron_right_rounded),
-            onTap: () {},
-          ),
-          const Divider(),
-          ListTile(
-            leading: const Icon(Icons.rate_review_rounded, color: Color(0xFFFB7A01)),
-            title: const Text('Reputación y Comentarios'),
-            trailing: const Icon(Icons.chevron_right_rounded),
-            onTap: () {},
+  // --- TAB 4: INGRESOS (Figma Image 13) ---
+  Widget _buildIngresosTab() {
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text('INGRESOS', style: TextStyle(color: Color(0xFFFF6600), fontWeight: FontWeight.bold, fontSize: 11, letterSpacing: 1)),
+          const SizedBox(height: 2),
+          const Text('Detalle financiero', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Color(0xFF111827))),
+          const SizedBox(height: 16),
+
+          // Total Card
+          Container(
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(color: const Color(0xFFEBEBE6)),
+            ),
+            child: Column(
+              children: [
+                const Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text('💰 Ingresos del mes', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                        Text('Julio 2026 · semana a semana', style: TextStyle(color: Color(0xFF6B7280), fontSize: 11)),
+                      ],
+                    ),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        Text('\$2000', style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold, color: Color(0xFFFF6600))),
+                        Text('total del mes', style: TextStyle(color: Color(0xFF6B7280), fontSize: 10)),
+                      ],
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 20),
+
+                Row(
+                  children: [
+                    Expanded(child: _buildIngresoStatBox('🔧', '28', 'servicios')),
+                    const SizedBox(width: 8),
+                    Expanded(child: _buildIngresoStatBox('📅', '4', 'semanas')),
+                    const SizedBox(width: 8),
+                    Expanded(child: _buildIngresoStatBox('💵', '\$71', 'por servicio')),
+                  ],
+                ),
+
+                const SizedBox(height: 20),
+
+                _buildSemanaBar('Semana 1', '1–7 Jul', '\$420', '6 trabajos · Regular', 0.6),
+                _buildSemanaBar('Semana 2', '8–14 Jul', '\$580', '8 trabajos · Muy bien', 0.8),
+                _buildSemanaBar('Semana 3', '15–21 Jul', '\$310', '5 trabajos · Regular', 0.45),
+                _buildSemanaBar('Semana 4', '22–31 Jul', '\$690', '9 trabajos · ¡Excelente!', 0.95),
+              ],
+            ),
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildIngresoStatBox(String icon, String val, String lbl) {
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 14),
+      decoration: BoxDecoration(
+        color: const Color(0xFFFFEAD5),
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Column(
+        children: [
+          Text(icon, style: const TextStyle(fontSize: 16)),
+          const SizedBox(height: 4),
+          Text(val, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Color(0xFF111827))),
+          Text(lbl, style: const TextStyle(fontSize: 10, color: Color(0xFF6B7280))),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSemanaBar(String sem, String dates, String amount, String status, double progress) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: const Color(0xFFF7F7F2),
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Column(
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text('$sem ($dates)', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+              Text(amount, style: const TextStyle(fontWeight: FontWeight.bold, color: Color(0xFFFF6600), fontSize: 15)),
+            ],
+          ),
+          const SizedBox(height: 4),
+          Align(
+            alignment: Alignment.centerRight,
+            child: Text(status, style: const TextStyle(fontSize: 11, color: Color(0xFF6B7280))),
+          ),
+          const SizedBox(height: 8),
+          LinearProgressIndicator(
+            value: progress,
+            backgroundColor: const Color(0xFFEBEBE6),
+            color: const Color(0xFFFF6600),
+            borderRadius: BorderRadius.circular(6),
+            minHeight: 8,
+          ),
+        ],
+      ),
+    );
+  }
+
+  // --- TAB 5: PERFIL (Figma Image 16 & 17) ---
+  Widget _buildPerfilTab() {
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text('MI PERFIL', style: TextStyle(color: Color(0xFFFF6600), fontWeight: FontWeight.bold, fontSize: 11, letterSpacing: 1)),
+          const SizedBox(height: 12),
+
+          // Header Card
+          Container(
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              gradient: const LinearGradient(
+                colors: [Color(0xFFFF6600), Color(0xFFFF8533)],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+              borderRadius: BorderRadius.circular(24),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Align(
+                  alignment: Alignment.topRight,
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.white.withAlpha(40),
+                      foregroundColor: Colors.white,
+                      minimumSize: const Size(110, 36),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+                    ),
+                    onPressed: () {},
+                    child: const Text('✏ Editar perfil', style: TextStyle(fontSize: 12)),
+                  ),
+                ),
+                const Row(
+                  children: [
+                    CircleAvatar(
+                      radius: 36,
+                      backgroundColor: Colors.white,
+                      child: Text('CM', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Color(0xFFFF6600))),
+                    ),
+                    SizedBox(width: 14),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text('Carlos Mendoza', style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold)),
+                        Text('Electricista Certificado', style: TextStyle(color: Color(0xFFFFEAD5), fontSize: 13, fontWeight: FontWeight.bold)),
+                        SizedBox(height: 4),
+                        Text('📍 Ciudad de México, Centro', style: TextStyle(color: Colors.white, fontSize: 11)),
+                      ],
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+
+          const SizedBox(height: 20),
+
+          Row(
+            children: [
+              Expanded(child: _buildWorkerStatCard('🏅', '8 años', 'Experiencia')),
+              const SizedBox(width: 12),
+              Expanded(child: _buildWorkerStatCard('✓', '127', 'Trabajos')),
+            ],
+          ),
+
+          const SizedBox(height: 20),
+
+          const Text('SOBRE MÍ', style: TextStyle(color: Color(0xFFFF6600), fontWeight: FontWeight.bold, fontSize: 11, letterSpacing: 1)),
+          const SizedBox(height: 8),
+          Container(
+            padding: const EdgeInsets.all(16),
+            width: double.infinity,
+            decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(18), border: Border.all(color: const Color(0xFFEBEBE6))),
+            child: const Text(
+              'Soluciono cortos circuitos, instalo cableado nuevo y hago mantenimiento preventivo.',
+              style: TextStyle(color: Color(0xFF4B5563), height: 1.4),
+            ),
+          ),
+
+          const SizedBox(height: 20),
+
+          const Text('CERTIFICACIONES', style: TextStyle(color: Color(0xFFFF6600), fontWeight: FontWeight.bold, fontSize: 11, letterSpacing: 1)),
+          const SizedBox(height: 8),
+          Row(
+            children: [
+              _buildCertPill('🛡 Licencia Tipo A'),
+              const SizedBox(width: 8),
+              _buildCertPill('🛡 Alta Tensión'),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildWorkerStatCard(String icon, String val, String lbl) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(18), border: Border.all(color: const Color(0xFFEBEBE6))),
+      child: Column(
+        children: [
+          Text(icon, style: const TextStyle(fontSize: 22)),
+          const SizedBox(height: 4),
+          Text(val, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Color(0xFFFF6600))),
+          Text(lbl, style: const TextStyle(fontSize: 11, color: Color(0xFF6B7280))),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCertPill(String label) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+      decoration: BoxDecoration(color: const Color(0xFFFFEAD5), borderRadius: BorderRadius.circular(16)),
+      child: Text(label, style: const TextStyle(color: Color(0xFFFF6600), fontWeight: FontWeight.bold, fontSize: 12)),
     );
   }
 }
