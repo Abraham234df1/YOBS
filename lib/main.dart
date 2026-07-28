@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 
 import 'screens/welcome_screen.dart';
-import 'screens/login_screen.dart';
-import 'screens/register_screen.dart';
 import 'screens/role_selection_screen.dart';
+import 'screens/register_client_screen.dart';
+import 'screens/register_worker_screen.dart';
+import 'screens/login_screen.dart';
 import 'screens/client_home_screen.dart';
 import 'screens/worker_home_screen.dart';
 import 'services/mongodb_service.dart';
@@ -22,8 +23,14 @@ class YobsApp extends StatefulWidget {
 }
 
 class _YobsAppState extends State<YobsApp> {
-  // Navigation State according to FOTOSFIGMA screenshots
-  // 0: Welcome Screen, 1: Login, 2: Register, 3: Role Selection, 4: Client Flow, 5: Worker Flow
+  // Navigation Flow State:
+  // 0: WelcomeScreen
+  // 1: RoleSelectionScreen (SELECCIÓN DE ROL ANTES DEL REGISTRO)
+  // 2: RegisterClientScreen (REGISTRO SEGURO DE CLIENTE CON VERIFICACIÓN DE IDENTIDAD)
+  // 3: RegisterWorkerScreen (REGISTRO DE TRABAJADOR / PERFIL PROFESIONAL)
+  // 4: LoginScreen
+  // 5: ClientHomeScreen
+  // 6: WorkerHomeScreen
   int _currentFlow = 0;
 
   @override
@@ -39,7 +46,7 @@ class _YobsAppState extends State<YobsApp> {
           secondary: const Color(0xFF111827),
           surface: const Color(0xFFF7F7F2),
         ),
-        scaffoldBackgroundColor: const Color(0xFFF7F7F2), // Figma Soft Cream Background
+        scaffoldBackgroundColor: const Color(0xFFF7F7F2),
         appBarTheme: const AppBarTheme(
           backgroundColor: Colors.white,
           elevation: 0,
@@ -99,44 +106,57 @@ class _YobsAppState extends State<YobsApp> {
     switch (_currentFlow) {
       case 0:
         return WelcomeScreen(
-          onGoToRegister: () => setState(() => _currentFlow = 2),
-          onGoToLogin: () => setState(() => _currentFlow = 1),
-          onGoToRoleSelection: () => setState(() => _currentFlow = 3),
+          // Pide selección de rol ANTES del registro
+          onGoToRegister: () => setState(() => _currentFlow = 1),
+          onGoToLogin: () => setState(() => _currentFlow = 4),
+          onGoToRoleSelection: () => setState(() => _currentFlow = 1),
         );
       case 1:
-        return LoginScreen(
-          onBack: () => setState(() => _currentFlow = 0),
-          onLoginSuccess: () => setState(() => _currentFlow = 3),
-          onGoToRegister: () => setState(() => _currentFlow = 2),
-        );
-      case 2:
-        return RegisterScreen(
-          onBack: () => setState(() => _currentFlow = 0),
-          onRegisterSuccess: () => setState(() => _currentFlow = 3),
-          onGoToLogin: () => setState(() => _currentFlow = 1),
-        );
-      case 3:
+        // PANTALLA DE SELECCIÓN DE ROL (ANTES DE REGISTRO)
         return RoleSelectionScreen(
           onBack: () => setState(() => _currentFlow = 0),
           onSelectRole: (isWorker) {
             setState(() {
-              _currentFlow = isWorker ? 5 : 4;
+              _currentFlow = isWorker ? 3 : 2; // Trabajador -> RegisterWorker, Cliente -> RegisterClient
             });
           },
         );
+      case 2:
+        // REGISTRO DE CLIENTE CON ALTA SEGURIDAD Y VERIFICACIÓN
+        return RegisterClientScreen(
+          onBack: () => setState(() => _currentFlow = 1),
+          onRegisterSuccess: () => setState(() => _currentFlow = 5),
+          onGoToLogin: () => setState(() => _currentFlow = 4),
+        );
+      case 3:
+        // REGISTRO DE TRABAJADOR / PERFIL PROFESIONAL
+        return RegisterWorkerScreen(
+          onBack: () => setState(() => _currentFlow = 1),
+          onRegisterSuccess: () => setState(() => _currentFlow = 6),
+          onGoToLogin: () => setState(() => _currentFlow = 4),
+        );
       case 4:
+        // INICIAR SESIÓN
+        return LoginScreen(
+          onBack: () => setState(() => _currentFlow = 0),
+          onLoginSuccess: () => setState(() => _currentFlow = 5),
+          onGoToRegister: () => setState(() => _currentFlow = 1),
+        );
+      case 5:
+        // CLIENTE APP
         return ClientHomeScreen(
           onLogout: () => setState(() => _currentFlow = 0),
         );
-      case 5:
+      case 6:
+        // TRABAJADOR APP
         return WorkerHomeScreen(
           onLogout: () => setState(() => _currentFlow = 0),
         );
       default:
         return WelcomeScreen(
-          onGoToRegister: () => setState(() => _currentFlow = 2),
-          onGoToLogin: () => setState(() => _currentFlow = 1),
-          onGoToRoleSelection: () => setState(() => _currentFlow = 3),
+          onGoToRegister: () => setState(() => _currentFlow = 1),
+          onGoToLogin: () => setState(() => _currentFlow = 4),
+          onGoToRoleSelection: () => setState(() => _currentFlow = 1),
         );
     }
   }
