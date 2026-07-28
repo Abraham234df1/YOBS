@@ -30,28 +30,30 @@ class _YobsAppState extends State<YobsApp> {
       theme: ThemeData(
         useMaterial3: true,
         colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color(0xFF2563EB),
-          primary: const Color(0xFF2563EB),
-          surface: const Color(0xFFF8FAFC),
+          seedColor: const Color(0xFFFB7A01), // Figma Primary Amber Orange
+          primary: const Color(0xFFFB7A01),
+          secondary: const Color(0xFF111A20),
+          surface: const Color(0xFFF6F6F0),
         ),
-        scaffoldBackgroundColor: const Color(0xFFF8FAFC),
+        scaffoldBackgroundColor: const Color(0xFFF6F6F0), // Figma Soft Cream Background
         appBarTheme: const AppBarTheme(
-          backgroundColor: Colors.white,
+          backgroundColor: Color(0xFF111A20), // Figma Dark Charcoal AppBar
           elevation: 0,
           scrolledUnderElevation: 1,
           surfaceTintColor: Colors.transparent,
-          iconTheme: IconThemeData(color: Color(0xFF0F172A)),
+          iconTheme: IconThemeData(color: Colors.white),
           titleTextStyle: TextStyle(
-            color: Color(0xFF0F172A),
+            color: Colors.white,
             fontSize: 18,
             fontWeight: FontWeight.bold,
           ),
         ),
         cardTheme: CardThemeData(
           elevation: 0,
+          color: Colors.white,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
-            side: const BorderSide(color: Color(0xFFE2E8F0)),
+            side: const BorderSide(color: Color(0xFFE5E7EB)),
           ),
         ),
       ),

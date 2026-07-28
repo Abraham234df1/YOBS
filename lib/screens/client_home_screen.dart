@@ -45,20 +45,22 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color(0xFFF6F6F0),
       appBar: AppBar(
+        backgroundColor: const Color(0xFF111A20),
         title: const Row(
           children: [
-            Icon(Icons.handyman_rounded, color: Color(0xFF2563EB)),
+            Icon(Icons.handyman_rounded, color: Color(0xFFFB7A01)),
             SizedBox(width: 8),
             Text(
               'YOBS',
-              style: TextStyle(fontWeight: FontWeight.bold, letterSpacing: 1),
+              style: TextStyle(fontWeight: FontWeight.bold, letterSpacing: 1, color: Colors.white),
             ),
           ],
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.help_outline_rounded),
+            icon: const Icon(Icons.help_outline_rounded, color: Colors.white),
             onPressed: () {
               Navigator.push(
                 context,
@@ -67,8 +69,8 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
             },
           ),
           IconButton(
-            icon: const Icon(Icons.swap_horiz_rounded),
-            tooltip: 'Cambiar de rol',
+            icon: const Icon(Icons.swap_horiz_rounded, color: Colors.white),
+            tooltip: 'Cambiar a modo Trabajador',
             onPressed: widget.onSwitchRole,
           ),
         ],
@@ -76,8 +78,9 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
       body: _buildCurrentTab(),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _currentIndex,
-        selectedItemColor: const Color(0xFF2563EB),
-        unselectedItemColor: const Color(0xFF94A3B8),
+        selectedItemColor: const Color(0xFFFB7A01), // Figma Primary Amber Orange
+        unselectedItemColor: const Color(0xFF6E717F),
+        backgroundColor: Colors.white,
         type: BottomNavigationBarType.fixed,
         onTap: (idx) => setState(() => _currentIndex = idx),
         items: const [
@@ -124,16 +127,16 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Banner Promocional / Bienvenida
+          // Banner Promocional Figma (#111A20 & #FB7A01)
           Container(
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
               gradient: const LinearGradient(
-                colors: [Color(0xFF2563EB), Color(0xFF1D4ED8)],
+                colors: [Color(0xFF111A20), Color(0xFF1E2A32)],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
               ),
-              borderRadius: BorderRadius.circular(20),
+              borderRadius: BorderRadius.circular(22),
             ),
             child: Row(
               children: [
@@ -152,12 +155,12 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
                       const SizedBox(height: 6),
                       const Text(
                         'Encuentra profesionales verificados para tu hogar o negocio con garantía YOBS.',
-                        style: TextStyle(color: Color(0xFFDBEAFE), fontSize: 12),
+                        style: TextStyle(color: Color(0xFF9CA3AF), fontSize: 12),
                       ),
                     ],
                   ),
                 ),
-                const Icon(Icons.verified_user_rounded, color: Colors.white, size: 44),
+                const Icon(Icons.verified_user_rounded, color: Color(0xFFFB7A01), size: 44),
               ],
             ),
           ),
@@ -169,7 +172,7 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
             onChanged: (val) => setState(() => _searchQuery = val),
             decoration: InputDecoration(
               hintText: 'Buscar oficio, electricista, plomero, pintor...',
-              prefixIcon: const Icon(Icons.search_rounded, color: Color(0xFF2563EB)),
+              prefixIcon: const Icon(Icons.search_rounded, color: Color(0xFFFB7A01)),
               suffixIcon: _searchQuery.isNotEmpty
                   ? IconButton(
                       icon: const Icon(Icons.clear),
@@ -177,20 +180,20 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
                     )
                   : null,
               filled: true,
-              fillColor: const Color(0xFFF1F5F9),
+              fillColor: Colors.white,
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(16),
-                borderSide: BorderSide.none,
+                borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
               ),
             ),
           ),
 
           const SizedBox(height: 24),
 
-          // Menú de Categorías con Íconos
+          // Categorías con Íconos según diseño Figma
           const Text(
             'Categorías de Oficios',
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Color(0xFF111A20)),
           ),
           const SizedBox(height: 12),
           SizedBox(
@@ -198,7 +201,7 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
             child: ListView(
               scrollDirection: Axis.horizontal,
               children: [
-                _buildCategoryChip('all', 'Todos', Icons.apps_rounded, const Color(0xFF475569)),
+                _buildCategoryChip('all', 'Todos', Icons.apps_rounded, const Color(0xFF111A20)),
                 ...MockDataService.categories.map((c) {
                   return _buildCategoryChip(c.id, c.title, c.icon, c.color);
                 }),
@@ -208,17 +211,17 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
 
           const SizedBox(height: 24),
 
-          // Listado de Especialistas Disponibles
+          // Listado de Especialistas Recomendados
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               const Text(
                 'Especialistas Recomendados',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Color(0xFF111A20)),
               ),
               Text(
                 '${_filteredWorkers.length} disponibles',
-                style: const TextStyle(color: Color(0xFF64748B), fontSize: 12),
+                style: const TextStyle(color: Color(0xFF6E717F), fontSize: 12),
               ),
             ],
           ),
@@ -230,12 +233,12 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
               alignment: Alignment.center,
               child: const Column(
                 children: [
-                  Icon(Icons.search_off_rounded, size: 48, color: Color(0xFF94A3B8)),
+                  Icon(Icons.search_off_rounded, size: 48, color: Color(0xFF6E717F)),
                   SizedBox(height: 8),
                   Text(
                     'No se encontraron especialistas en esta categoría.',
                     textAlign: TextAlign.center,
-                    style: TextStyle(color: Color(0xFF64748B)),
+                    style: TextStyle(color: Color(0xFF6E717F)),
                   ),
                 ],
               ),
@@ -260,20 +263,20 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
     return GestureDetector(
       onTap: () => setState(() => _selectedCategoryId = id),
       child: Container(
-        width: 85,
+        width: 88,
         margin: const EdgeInsets.only(right: 12),
         padding: const EdgeInsets.all(10),
         decoration: BoxDecoration(
-          color: isSelected ? color : Colors.white,
+          color: isSelected ? const Color(0xFFFB7A01) : Colors.white,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
-            color: isSelected ? color : const Color(0xFFE2E8F0),
+            color: isSelected ? const Color(0xFFFB7A01) : const Color(0xFFE5E7EB),
             width: isSelected ? 2 : 1,
           ),
           boxShadow: isSelected
               ? [
                   BoxShadow(
-                    color: color.withAlpha(80),
+                    color: const Color(0xFFFB7A01).withAlpha(80),
                     blurRadius: 8,
                     offset: const Offset(0, 4),
                   ),
@@ -293,7 +296,7 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
               style: TextStyle(
                 fontSize: 11,
                 fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
-                color: isSelected ? Colors.white : const Color(0xFF1E293B),
+                color: isSelected ? Colors.white : const Color(0xFF111A20),
               ),
             ),
           ],
@@ -308,7 +311,7 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: const Color(0xFFE2E8F0)),
+        border: Border.all(color: const Color(0xFFE5E7EB)),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withAlpha(8),
@@ -339,13 +342,13 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
               children: [
                 CircleAvatar(
                   radius: 32,
-                  backgroundColor: const Color(0xFF2563EB).withAlpha(20),
+                  backgroundColor: const Color(0xFFFB7A01).withAlpha(20),
                   child: Text(
                     worker.name.substring(0, 2).toUpperCase(),
                     style: const TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 20,
-                      color: Color(0xFF2563EB),
+                      color: Color(0xFFFB7A01),
                     ),
                   ),
                 ),
@@ -356,12 +359,12 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
                     children: [
                       Text(
                         worker.name,
-                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Color(0xFF111A20)),
                       ),
                       const SizedBox(height: 2),
                       Text(
                         worker.mainTrade,
-                        style: const TextStyle(color: Color(0xFF64748B), fontSize: 13),
+                        style: const TextStyle(color: Color(0xFF6E717F), fontSize: 13),
                       ),
                       const SizedBox(height: 6),
                       Row(
@@ -374,7 +377,7 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
                           ),
                           Text(
                             ' (${worker.totalJobs} trabajos)',
-                            style: const TextStyle(color: Color(0xFF94A3B8), fontSize: 11),
+                            style: const TextStyle(color: Color(0xFF6E717F), fontSize: 11),
                           ),
                         ],
                       ),
@@ -389,18 +392,18 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
                       style: const TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
-                        color: Color(0xFF2563EB),
+                        color: Color(0xFFFB7A01),
                       ),
                     ),
-                    const Text('/hr', style: TextStyle(color: Color(0xFF94A3B8), fontSize: 10)),
+                    const Text('/hr', style: TextStyle(color: Color(0xFF6E717F), fontSize: 10)),
                     const SizedBox(height: 10),
                     Container(
                       padding: const EdgeInsets.all(6),
                       decoration: const BoxDecoration(
-                        color: Color(0xFFEFF6FF),
+                        color: Color(0xFFFFF3E0),
                         shape: BoxShape.circle,
                       ),
-                      child: const Icon(Icons.arrow_forward_ios_rounded, size: 14, color: Color(0xFF2563EB)),
+                      child: const Icon(Icons.arrow_forward_ios_rounded, size: 14, color: Color(0xFFFB7A01)),
                     ),
                   ],
                 ),
@@ -421,12 +424,12 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
         children: [
           const Text(
             'Panel de Solicitudes Activas',
-            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Color(0xFF111A20)),
           ),
           const SizedBox(height: 4),
           const Text(
             'Seguimiento en tiempo real de tus contrataciones.',
-            style: TextStyle(color: Color(0xFF64748B), fontSize: 13),
+            style: TextStyle(color: Color(0xFF6E717F), fontSize: 13),
           ),
           const SizedBox(height: 16),
 
@@ -472,8 +475,8 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFFE2E8F0)),
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: const Color(0xFFE5E7EB)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -483,7 +486,7 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
             children: [
               Text(
                 req.id,
-                style: const TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF64748B)),
+                style: const TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF6E717F)),
               ),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
@@ -501,17 +504,17 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
           const SizedBox(height: 8),
           Text(
             req.serviceTitle,
-            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Color(0xFF111A20)),
           ),
           const SizedBox(height: 4),
           Text(
             'Especialista: ${req.worker.name}',
-            style: const TextStyle(color: Color(0xFF334155), fontWeight: FontWeight.w500),
+            style: const TextStyle(color: Color(0xFF374151), fontWeight: FontWeight.w500),
           ),
           const SizedBox(height: 4),
           Text(
             'Ubicación: ${req.address}',
-            style: const TextStyle(color: Color(0xFF64748B), fontSize: 12),
+            style: const TextStyle(color: Color(0xFF6E717F), fontSize: 12),
           ),
           const Divider(height: 24),
           Row(
@@ -519,7 +522,7 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
             children: [
               Text(
                 '\$${req.estimatedCost.toStringAsFixed(0)} USD',
-                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Color(0xFF2563EB)),
+                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Color(0xFFFB7A01)),
               ),
               Row(
                 children: [
@@ -544,7 +547,7 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
                   if (req.isPaid) ...[
                     const SizedBox(width: 8),
                     IconButton(
-                      icon: const Icon(Icons.receipt_rounded, color: Color(0xFF2563EB)),
+                      icon: const Icon(Icons.receipt_rounded, color: Color(0xFFFB7A01)),
                       tooltip: 'Ver Comprobante',
                       onPressed: () {
                         Navigator.push(
@@ -577,15 +580,15 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
           tileColor: Colors.white,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
-            side: const BorderSide(color: Color(0xFFE2E8F0)),
+            side: const BorderSide(color: Color(0xFFE5E7EB)),
           ),
           leading: CircleAvatar(
-            backgroundColor: const Color(0xFF2563EB),
+            backgroundColor: const Color(0xFFFB7A01),
             child: Text(worker.name.substring(0, 1), style: const TextStyle(color: Colors.white)),
           ),
-          title: Text(worker.name, style: const TextStyle(fontWeight: FontWeight.bold)),
+          title: Text(worker.name, style: const TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF111A20))),
           subtitle: const Text('Voy en camino, llego en 15 minutos...'),
-          trailing: const Text('10:45 AM', style: TextStyle(color: Color(0xFF94A3B8), fontSize: 11)),
+          trailing: const Text('10:45 AM', style: TextStyle(color: Color(0xFF6E717F), fontSize: 11)),
           onTap: () {
             Navigator.push(
               context,
@@ -613,12 +616,12 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
         children: [
           const Text(
             'Historial del Usuario',
-            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Color(0xFF111A20)),
           ),
           const SizedBox(height: 4),
           const Text(
             'Servicios completados con opción de repetir contratación en 1-clic.',
-            style: TextStyle(color: Color(0xFF64748B), fontSize: 13),
+            style: TextStyle(color: Color(0xFF6E717F), fontSize: 13),
           ),
           const SizedBox(height: 16),
 
@@ -635,7 +638,7 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
                         decoration: BoxDecoration(
                           color: Colors.white,
                           borderRadius: BorderRadius.circular(16),
-                          border: Border.all(color: const Color(0xFFE2E8F0)),
+                          border: Border.all(color: const Color(0xFFE5E7EB)),
                         ),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -643,17 +646,17 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                Text(item.serviceTitle, style: const TextStyle(fontWeight: FontWeight.bold)),
-                                Text('\$${item.estimatedCost.toStringAsFixed(0)} USD', style: const TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF2563EB))),
+                                Text(item.serviceTitle, style: const TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF111A20))),
+                                Text('\$${item.estimatedCost.toStringAsFixed(0)} USD', style: const TextStyle(fontWeight: FontWeight.bold, color: Color(0xFFFB7A01))),
                               ],
                             ),
                             const SizedBox(height: 4),
-                            Text('Especialista: ${item.worker.name}', style: const TextStyle(color: Color(0xFF64748B), fontSize: 12)),
+                            Text('Especialista: ${item.worker.name}', style: const TextStyle(color: Color(0xFF6E717F), fontSize: 12)),
                             const SizedBox(height: 12),
                             ElevatedButton.icon(
                               style: ElevatedButton.styleFrom(
-                                backgroundColor: const Color(0xFFEFF6FF),
-                                foregroundColor: const Color(0xFF2563EB),
+                                backgroundColor: const Color(0xFFFFF3E0),
+                                foregroundColor: const Color(0xFFFB7A01),
                                 minimumSize: const Size.fromHeight(40),
                                 elevation: 0,
                               ),
