@@ -104,11 +104,13 @@ class OrderModel {
       case 'enProceso':
         reqStatus = RequestStatus.enProceso;
         break;
+      case 'finalizada':
       case 'finalizado':
-        reqStatus = RequestStatus.finalizado;
+        reqStatus = RequestStatus.finalizada;
         break;
+      case 'cancelada':
       case 'cancelado':
-        reqStatus = RequestStatus.cancelado;
+        reqStatus = RequestStatus.cancelada;
         break;
       default:
         reqStatus = RequestStatus.pendiente;
@@ -118,14 +120,11 @@ class OrderModel {
       id: orderId,
       serviceTitle: serviceTitle,
       worker: worker,
-      clientName: clientName,
-      date: orderDate,
       address: serviceAddress,
       description: serviceDescription,
-      estimatedCost: estimatedCost,
+      requestedDate: orderDate,
+      estimatedPrice: estimatedCost,
       status: reqStatus,
-      paymentMethod: paymentMethod,
-      isPaid: isPaid,
     );
   }
 }

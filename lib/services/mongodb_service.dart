@@ -116,14 +116,13 @@ class MongoDbService {
         "requestId": request.id,
         "serviceTitle": request.serviceTitle,
         "workerName": request.worker.name,
-        "clientName": request.clientName,
-        "date": request.date.toIso8601String(),
+        "workerTrade": request.worker.mainTrade,
+        "requestedDate": request.requestedDate.toIso8601String(),
         "address": request.address,
         "description": request.description,
-        "estimatedCost": request.estimatedCost,
+        "estimatedPrice": request.estimatedPrice,
+        "urgency": request.urgency.name,
         "status": request.status.name,
-        "paymentMethod": request.paymentMethod,
-        "isPaid": request.isPaid,
         "createdAt": DateTime.now().toIso8601String(),
       });
       debugPrint("✅ Solicitud guardada en MongoDB con ID: ${request.id}");
@@ -140,9 +139,10 @@ class MongoDbService {
     try {
       await _chatCollection!.insertOne({
         "messageId": msg.id,
+        "senderId": msg.senderId,
         "senderName": msg.senderName,
-        "isWorker": msg.isWorker,
-        "text": msg.text,
+        "content": msg.content,
+        "isFromClient": msg.isFromClient,
         "timestamp": msg.timestamp.toIso8601String(),
       });
       return true;

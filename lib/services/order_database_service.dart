@@ -39,8 +39,37 @@ class OrderDatabaseService {
     }
   }
 
-  /// Create a new order in MongoDB
-  static Future<OrderModel?> createOrder({
+  /// Create a new order from a JobRequest (saves to MongoDB)
+  static Future<void> createOrder(JobRequest request) async {
+    await initDatabase();
+    if (!_isConnected || _ordersCollection == null) {
+      debugPrint('⚠️ MongoDB no conectado — solicitud guardada en memoria local.');
+      return;
+    }
+    try {
+      await _ordersCollection!.insertOne({
+        '_id': ObjectId(),
+        'requestId': request.id,
+        'serviceTitle': request.serviceTitle,
+        'workerName': request.worker.name,
+        'workerTrade': request.worker.mainTrade,
+        'workerId': request.worker.id,
+        'requestedDate': request.requestedDate.toIso8601String(),
+        'address': request.address,
+        'description': request.description,
+        'estimatedPrice': request.estimatedPrice,
+        'urgency': request.urgency.name,
+        'status': request.status.name,
+        'createdAt': DateTime.now().toIso8601String(),
+      });
+      debugPrint('💾 Solicitud ${request.id} guardada en MongoDB.');
+    } catch (e) {
+      debugPrint('Error guardando solicitud en MongoDB: $e');
+    }
+  }
+
+  /// Create a new order with individual fields (used by older code)
+  static Future<OrderModel?> createOrderFromFields({
     required WorkerProfile worker,
     required String clientName,
     required String address,
@@ -66,7 +95,7 @@ class OrderDatabaseService {
       estimatedHours: hours.toInt(),
       status: 'pendiente',
       paymentMethod: paymentMethod,
-      isPaid: true, // Retenido de forma segura en MongoDB
+      isPaid: false,
       receiptNumber: 'REC-${DateTime.now().millisecondsSinceEpoch.toString().substring(6)}',
     );
 
@@ -75,9 +104,9 @@ class OrderDatabaseService {
     if (_isConnected && _ordersCollection != null) {
       try {
         await _ordersCollection!.insertOne(newOrder.toMongoBson());
-        debugPrint("💾 ¡Pedido ${newOrder.orderId} guardado exitosamente en MongoDB!");
+        debugPrint('💾 Pedido ${newOrder.orderId} guardado en MongoDB.');
       } catch (e) {
-        debugPrint("Error guardando pedido en MongoDB: $e");
+        debugPrint('Error guardando pedido en MongoDB: $e');
       }
     }
 
